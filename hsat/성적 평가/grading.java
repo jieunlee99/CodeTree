@@ -1,68 +1,89 @@
+import java.io.*;
 import java.util.*;
 
 public class Main {
 
-    public static void main(String[] args) {
+    static class Score implements Comparable<Score> {
+        int idx;
+        int score;
+
+        Score(int idx, int score) {
+            this.idx = idx;
+            this.score = score;
+        }
+
+        @Override
+        public int compareTo(Score o) {
+            return o.score - this.score;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
         StringBuilder sb = new StringBuilder();
-        Scanner sc = new Scanner(System.in);
 
-        int n = sc.nextInt();
+        int n = Integer.parseInt(br.readLine());
 
-        int[][] scores = new int[3][n];
+        int[] total = new int[n];
 
         for (int contest = 0; contest < 3; contest++) {
+
+            st = new StringTokenizer(br.readLine());
+
+            Score[] arr = new Score[n];
+            int[] rank = new int[n];
+
             for (int i = 0; i < n; i++) {
-                scores[contest][i] = sc.nextInt();
+                int score = Integer.parseInt(st.nextToken());
+
+                arr[i] = new Score(i, score);
+                total[i] += score;
             }
+
+            Arrays.sort(arr); // 점수순 정렬
+
+            for (int i = 0; i < n; i++) {
+                if (i == 0) {
+                    rank[arr[i].idx] = 1;
+                } else if (arr[i].score == arr[i - 1].score) {
+                    rank[arr[i].idx] = rank[arr[i - 1].idx];
+                } else {
+                    rank[arr[i].idx] = i + 1;
+                }
+            }
+
+            for (int i = 0; i < n; i++) {
+                sb.append(rank[i]).append(' ');
+            }
+
+            sb.append('\n');
         }
 
-        int[] result = new int[n];
-
-        // 3개 대회 순위
-        for (int contest = 0; contest < 3; contest++) {
-
-            Integer[] sorted = new Integer[n];
-
-            for (int i = 0; i < n; i++) {
-                sorted[i] = scores[contest][i];
-                result[i] += scores[contest][i];
-            }
-
-            Arrays.sort(sorted, Collections.reverseOrder());
-
-            // <점수, 순위>
-            Map<Integer, Integer> rankMap = new HashMap<>();
-
-            for (int i = 0; i < n; i++) {
-                rankMap.putIfAbsent(sorted[i], i + 1);
-            }
-
-            for (int i = 0; i < n; i++) {
-                sb.append(rankMap.get(scores[contest][i])).append(" ");
-            }
-
-            sb.append("\n");
-        }
-
-        // 최종 점수 순위
-        Integer[] sorted = new Integer[n];
+        Score[] arr = new Score[n];
+        int[] rank = new int[n];
 
         for (int i = 0; i < n; i++) {
-            sorted[i] = result[i];
+            arr[i] = new Score(i, total[i]);
         }
 
-        Arrays.sort(sorted, Collections.reverseOrder());
-
-        Map<Integer, Integer> rankMap = new HashMap<>();
+        Arrays.sort(arr);
 
         for (int i = 0; i < n; i++) {
-            rankMap.putIfAbsent(sorted[i], i + 1);
+            if (i == 0) {
+                rank[arr[i].idx] = 1;
+            } else if (arr[i].score == arr[i - 1].score) {
+                rank[arr[i].idx] = rank[arr[i - 1].idx];
+            } else {
+                rank[arr[i].idx] = i + 1;
+            }
         }
 
         for (int i = 0; i < n; i++) {
-            sb.append(rankMap.get(result[i])).append(" ");
+            sb.append(rank[i]).append(' ');
         }
 
-        System.out.println(sb);
+        System.out.print(sb);
     }
 }
